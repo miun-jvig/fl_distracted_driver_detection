@@ -111,9 +111,9 @@ def fitting(training_generator, validation_generator, model, warmstart,
         period=3)
     csv_eval_path = "./logs/" + modelname + "/training_startingfrom" + warmstart + ".log"
     csv_callback = tf.keras.callbacks.CSVLogger(csv_eval_path)
-    #early_stopping = tf.keras.callbacks.EarlyStopping(
+    # early_stopping = tf.keras.callbacks.EarlyStopping(
     #    monitor="val_loss", patience=5, restore_best_weights=True
-    #)
+    # )
     model.save_weights(checkpoint_path.format(epoch=0))
     history = model.fit(training_generator,
                         steps_per_epoch=nb_steps_training,
@@ -127,9 +127,8 @@ def fitting(training_generator, validation_generator, model, warmstart,
     return model, history
 
 
-
-def training_model(x,y, model, modelname, nb_epoch=10, warmstart='0', batch_size=32, generator_type='vanilla',
-                   augmentation=True, class_weight=False, vali_ratio=0.2, input_shape=(128,128,3)):
+def training_model(x, y, model, modelname, nb_epoch=10, warmstart='0', batch_size=32, generator_type='vanilla',
+                   augmentation=True, class_weight=False, vali_ratio=0.2, input_shape=(128, 128, 3)):
 
     # data augmentation or not?
     train_datagen, validation_datagen = input_processing(augmentation)

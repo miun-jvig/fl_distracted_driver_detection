@@ -3,6 +3,7 @@ from keras.models import Sequential, Model
 from keras.applications import EfficientNetB0, Xception, EfficientNetB3, MobileNetV2, VGG16
 from keras.layers import Flatten, Dense, Dropout, GlobalAveragePooling2D
 
+
 def create_vgg16(input_shape, classes = 3, fclayers=[2048, 1024], trainable=False, init='imagenet'):
     """
     Architecture and adaptation of the VGG16 for our project

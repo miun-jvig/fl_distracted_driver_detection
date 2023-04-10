@@ -11,6 +11,7 @@ import numpy as np
 import argparse
 import random
 
+
 def dir_path(string):
     try:
         os.path.isdir(string)
