@@ -60,9 +60,9 @@ def read_hdf5(hdf5_dir=Path('./'), subset='train', rows=256, cols=256):
     images, labels = [], []
     # Open the HDF5 file
     file = h5py.File(hdf5_dir / f"driver_distraction_{rows}x{cols}_{subset}.h5", "r+")
-    #images = np.array(file["/images"]).astype(float)
-    #labels = np.array(file["/meta"]).astype(int)
-    return file #images, labels
+    # images = np.array(file["/images"]).astype(float)
+    # labels = np.array(file["/meta"]).astype(int)
+    return file # images, labels
 
 
 def store_hdf5(images, labels, out_dir=Path('./'), subset='train', rows=256, cols=256):
@@ -93,6 +93,7 @@ def convert(datapath, output, subset, rows, cols):
     hdf5_dir.mkdir(parents=True, exist_ok=True)
     print('Reading the dataset')
     images, labels = load_data(datapath, subset, rows, cols)
+    # TODO: create function to split images and labels into N blocks, then call store-h5 for each block
     print('Writing the dataset')
     store_hdf5(images, labels, hdf5_dir, subset, rows, cols)
 
