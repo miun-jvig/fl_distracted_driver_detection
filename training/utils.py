@@ -34,8 +34,6 @@ def train_val_split(x,y, val_ratio=0.1):
 
 
 def preprocess_labels(y, classes):
-    unique_values = np.unique(y)
-    print("Unique values in y:", unique_values)
     return to_categorical(np.array(y).astype(int), num_classes=classes)
 
 

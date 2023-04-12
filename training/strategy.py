@@ -107,8 +107,7 @@ def fitting(training_generator, validation_generator, model, warmstart,
         filepath=checkpoint_path,
         verbose=1,
         save_weights_only=True,
-        save_freq='epoch',
-        period=3)
+        save_freq='epoch')
     csv_eval_path = "./logs/" + modelname + "/training_startingfrom" + warmstart + ".log"
     csv_callback = tf.keras.callbacks.CSVLogger(csv_eval_path)
     # early_stopping = tf.keras.callbacks.EarlyStopping(

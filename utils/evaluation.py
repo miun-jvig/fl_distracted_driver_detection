@@ -8,9 +8,9 @@ import os
 def evaluation(xtest, ytest, model, history, filedir):
     creating_dir(filedir)
     y_prediction = model.predict(xtest)
-    plot_hist(history, os.path.join(filedir , 'training_history'))
+    plot_hist(history, os.path.join(filedir, 'training_history'))
     confmat = confusion_matrix(ytest, y_prediction.argmax(axis=1))
-    plot_confmat(confmat, os.path.join(filedir ,'confusion_matrix'))
+    plot_confmat(confmat, os.path.join(filedir, 'confusion_matrix'))
     report = classification_report(ytest, y_prediction.argmax(axis=1),
                                 target_names=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], output_dict=True)
     df_classification_report = pd.DataFrame(report).transpose()

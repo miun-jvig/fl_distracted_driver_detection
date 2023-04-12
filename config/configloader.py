@@ -2,7 +2,6 @@ from configparser import ConfigParser
 
 # load data
 config_file = 'config/config.ini'
-print('Reading {} as the configuration file'.format(config_file))
 config_object = ConfigParser(comment_prefixes=('#', ';'))
 config_object.read(config_file)
 
