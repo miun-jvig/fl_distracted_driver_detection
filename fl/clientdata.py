@@ -20,31 +20,29 @@ compiling(model)
 # model.summary()
 
 
-def load_clients():
+def load_test_data_and_model():
+    file_test = read_hdf5(hdf5_dir, 'test', rows, cols)
+    xt = file_test["/images"]
+    yt = file_test["/meta"]
+    return model, xt, yt
+
+
+def load_training_data():
     print('Reading the dataset from {}'.format(hdf5_dir))
     train_files = []
-    test_files = []
     train_data = {}
-    test_data = {}
 
     for i in range(nb_clients):
         # loading the different datasets (train, validation and test)
         train_file = read_hdf5(hdf5_dir, f'train-{i}', rows, cols)
-        test_file = read_hdf5(hdf5_dir, f'test-{i}', rows, cols)
         train_files.append(train_file)
-        test_files.append(test_file)
 
     for i, file in enumerate(train_files):
         train_data[f'x{i}'] = file['/images']
         train_data[f'y{i}'] = file['/meta']
 
-    for i, file in enumerate(test_files):
-        test_data[f'xt{i}'] = file['/images']
-        test_data[f'yt{i}'] = file['/meta']
-
     # clients
     clientmodels = {}
     for i in range(nb_clients):
-        clientmodels[str(i)] = (model, train_data[f'x{i}'], train_data[f'y{i}'],
-                                test_data[f'xt{i}'], test_data[f'yt{i}'])
+        clientmodels[str(i)] = (train_data[f'x{i}'], train_data[f'y{i}'])
     return clientmodels

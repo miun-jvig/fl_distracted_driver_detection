@@ -95,8 +95,8 @@ def convert(datapath, output, subset, rows, cols, part):
     images, labels = load_data(datapath, subset, rows, cols)
     block_size = len(labels) // part  # amount of images/labels per partition
     for index in range(part):
-        print('Splitting the dataset into partition {}'.format(index) if part >= 1 else 'Writing the dataset')
-        subset_index = subset + '-' + str(index)  # train0, train1, ..., trainpart
+        print('Splitting the dataset into partition {}'.format(index) if part > 1 else 'Writing the dataset')
+        subset_index = subset + '-' + str(index) if part > 1 else subset   # train0, train1, ..., trainpart
         start = index * block_size
         end = (index + 1) * block_size
         store_hdf5(images[start: end], labels[start: end], hdf5_dir, subset_index, rows, cols)
@@ -115,4 +115,4 @@ if __name__ == '__main__':
     convert(args.datapath, args.destpath, args.set, args.rows, args.cols, args.part)
 
 # python preprocessing\data.py -o h5 -d data/statefarm/ -r 128 -c 128 -n 2 -s train
-# python preprocessing\data.py -o h5 -d data/statefarm/ -r 128 -c 128 -n 2 -s test
+# python preprocessing\data.py -o h5 -d data/statefarm/ -r 128 -c 128 -s test

@@ -98,17 +98,16 @@ def data_generator(x_train, y_train, x_vali, y_vali, gen_type='vanilla', batch_s
     return training_generator, validation_generator
 
 
-def fitting(training_generator, validation_generator, model, warmstart,
+def fitting(training_generator, validation_generator, model, cid, warmstart,
             nb_steps_training, nb_steps_val, modelname, nb_epoch=10, class_weight=None):
-
-
-    checkpoint_path = "./logs/" + modelname + "/cpft-{epoch:04d}.ckpt"
+    path = "./logs/" + modelname + "/client-" + cid + "/"
+    checkpoint_path = path + "/cpft-{epoch:04d}.ckpt"
     cp_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_path,
         verbose=1,
         save_weights_only=True,
         save_freq='epoch')
-    csv_eval_path = "./logs/" + modelname + "/training_startingfrom" + warmstart + ".log"
+    csv_eval_path = path + "/training_startingfrom" + warmstart + ".log"
     csv_callback = tf.keras.callbacks.CSVLogger(csv_eval_path)
     # early_stopping = tf.keras.callbacks.EarlyStopping(
     #    monitor="val_loss", patience=5, restore_best_weights=True
@@ -126,7 +125,7 @@ def fitting(training_generator, validation_generator, model, warmstart,
     return model, history
 
 
-def training_model(x, y, model, modelname, nb_epoch=10, warmstart='0', batch_size=32, generator_type='vanilla',
+def training_model(x, y, model, modelname, nb_epoch=10, cid=0, warmstart='0', batch_size=32, generator_type='vanilla',
                    augmentation=True, class_weight=False, vali_ratio=0.2, input_shape=(128, 128, 3)):
 
     # data augmentation or not?
@@ -140,8 +139,9 @@ def training_model(x, y, model, modelname, nb_epoch=10, warmstart='0', batch_siz
     # split the set into train and validation
     x_train, y_train, x_vali, y_vali = train_val_split(x, y, vali_ratio)
     # how the batch is created, using: mixup, oversampling, undersampling, or vanilla version
-    training_generator, validation_generator = data_generator(x_train, y_train, x_vali, y_vali, generator_type, batch_size,
-                                                              train_datagen, validation_datagen, input_shape)
+    training_generator, validation_generator = data_generator(x_train, y_train, x_vali, y_vali, generator_type,
+                                                              batch_size, train_datagen, validation_datagen,
+                                                              input_shape)
 
     if 'un' in generator_type.lower() or 'ov' in generator_type.lower():
         nb_steps_training = training_generator.steps_per_epoch
@@ -149,5 +149,5 @@ def training_model(x, y, model, modelname, nb_epoch=10, warmstart='0', batch_siz
     else:
         nb_steps_training = len(y_train) // batch_size
         nb_steps_val = len(y_vali) // batch_size
-    return fitting(training_generator, validation_generator, model, warmstart,
+    return fitting(training_generator, validation_generator, model, cid, warmstart,
                    nb_steps_training, nb_steps_val, modelname, nb_epoch=nb_epoch, class_weight=cw)

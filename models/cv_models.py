@@ -118,9 +118,9 @@ def compiling(model):
     model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
 
 
-def loading_checkpoint(model, modelname, warmstart):
+def loading_checkpoint(model, cid, modelname, warmstart):
     if warmstart != str(0):
-        model.load_weights("./logs/" + modelname + "/cpft-" + warmstart + ".ckpt")
+        model.load_weights("./logs/" + modelname + "/client-" + cid + "/cpft-" + warmstart + ".ckpt")
 
 
 def create_model(name, input_shape, classes, fclayers, trainable, init):

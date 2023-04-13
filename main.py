@@ -1,26 +1,24 @@
-from fl.client import client_fn
-from fl.clientdata import model
-from config.configloader import client_cfg, config_file, model_cfg
-import flwr as fl
+from fl.simulation import simulation
+from utils.evaluation import evaluation
+from fl.client import training_history
+from fl.clientdata import load_test_data_and_model
+from config.configloader import model_cfg
+import os
 
-# data from config
+# data
+models_dir = model_cfg['models_dir']
 model_name = model_cfg['model_name']
-nb_clients = int(client_cfg['nb_clients'])
-nb_rounds = int(client_cfg['nb_rounds'])
-params = model.get_weights()
-print('Reading {} as the configuration file'.format(config_file))
-print('Creating a {} model'.format(model_name))
 
 
 def main():
-    strategy = fl.server.strategy.FedAvg(initial_parameters=fl.common.ndarrays_to_parameters(params))
     # start simulation
-    fl.simulation.start_simulation(
-        client_fn=client_fn,
-        num_clients=nb_clients,
-        config=fl.server.ServerConfig(num_rounds=nb_rounds),
-        strategy=strategy,
-    )
+    simulation()
+    test = training_history
+    print('training_history is of size {}'.format(len(test)))
+    # evaluate results
+    model, xt, yt = load_test_data_and_model()
+    print('Evaluating the model on the test set and store everything in {}'.format(models_dir))
+    evaluation(model, xt, yt, training_history, os.path.join(models_dir, model_name))
 
 
 if __name__ == '__main__':

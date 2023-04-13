@@ -11,20 +11,20 @@ def creating_dir(filedir):
     os.makedirs(filedir, exist_ok=True)
 
 
-def plot_hist(history, filename):
-    fig, ((ax1, ax2)) = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
-    ax1.plot(history.history['accuracy'], 'b', history.history['val_accuracy'], 'r')
-    ax1.set_ylabel('Accuracy Rate', fontsize=12)
-    ax1.set_xlabel('Iteration', fontsize=12)
-    ax1.set_title(
-        'Categorical Cross Entropy (Data augmentation)',
-        fontsize=12)
-    ax1.legend(['Training Accuracy', 'Validation Accuracy'], fontsize=12, loc='best')
-    ax2.plot(history.history['loss'], 'b', history.history['val_loss'], 'r')
-    ax2.set_ylabel('Loss', fontsize=12)
-    ax2.set_xlabel('Iteration', fontsize=12)
-    ax2.set_title('Learning Curve', fontsize=14)
-    ax2.legend(['Training Loss', 'Validation Loss'], fontsize=12, loc='best')
+def plot_hist(training_history, filename):
+    fig, axs = plt.subplots(len(training_history), 2, figsize=(20, 6*len(training_history)))
+    for i, history in enumerate(training_history):
+        axs[i, 0].plot(history['accuracy'], 'b', history['val_accuracy'], 'r')
+        axs[i, 0].set_ylabel('Accuracy Rate', fontsize=12)
+        axs[i, 0].set_xlabel('Iteration', fontsize=12)
+        axs[i, 0].set_title(f'Client {i+1} Accuracy', fontsize=12)
+        axs[i, 0].legend(['Training Accuracy', 'Validation Accuracy'], fontsize=12, loc='best')
+        axs[i, 1].plot(history['loss'], 'b', history['val_loss'], 'r')
+        axs[i, 1].set_ylabel('Loss', fontsize=12)
+        axs[i, 1].set_xlabel('Iteration', fontsize=12)
+        axs[i, 1].set_title(f'Client {i+1} Loss', fontsize=14)
+        axs[i, 1].legend(['Training Loss', 'Validation Loss'], fontsize=12, loc='best')
+    plt.tight_layout()
     plt.savefig(filename+'.png')
     #plt.show()
 
