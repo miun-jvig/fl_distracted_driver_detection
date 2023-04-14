@@ -18,7 +18,6 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     # Multiply accuracy of each client by number of examples used
     accuracies = [num_examples * m["accuracy"] for num_examples, m in metrics]
     examples = [num_examples for num_examples, _ in metrics]
-
     # Aggregate and return custom metric (weighted average)
     return {"accuracy": sum(accuracies) / sum(examples)}
 
@@ -29,9 +28,10 @@ strategy = fl.server.strategy.FedAvg(
 
 
 def simulation():
-    fl.simulation.start_simulation(
+    results = fl.simulation.start_simulation(
         client_fn=client_fn,
         num_clients=nb_clients,
         config=fl.server.ServerConfig(num_rounds=nb_rounds),
         strategy=strategy,
     )
+    return results

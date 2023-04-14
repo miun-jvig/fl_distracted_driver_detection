@@ -21,6 +21,7 @@ compiling(model)
 
 
 def load_test_data_and_model():
+    # loading the test dataset
     file_test = read_hdf5(hdf5_dir, 'test', rows, cols)
     xt = file_test["/images"]
     yt = file_test["/meta"]
@@ -33,7 +34,7 @@ def load_training_data():
     train_data = {}
 
     for i in range(nb_clients):
-        # loading the different datasets (train, validation and test)
+        # loading the train dataset
         train_file = read_hdf5(hdf5_dir, f'train-{i}', rows, cols)
         train_files.append(train_file)
 

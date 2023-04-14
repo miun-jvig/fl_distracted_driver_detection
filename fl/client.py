@@ -5,6 +5,7 @@ from config.configloader import data_cfg, strategy_cfg, model_cfg
 from fl.clientdata import load_training_data, load_test_data_and_model
 from training.utils import preprocess_labels
 import numpy as np
+import pandas as pd
 
 # data from config
 rows, cols = int(data_cfg['rows']), int(data_cfg['cols'])
@@ -18,8 +19,6 @@ models_dir = model_cfg['models_dir']
 class_weight = model_cfg.getboolean('class_weight')
 augmentation = strategy_cfg.getboolean('augmentation')
 generator_type = strategy_cfg['generator_type']
-
-training_history = []
 
 
 class FlowerClient(fl.client.NumPyClient):
@@ -43,14 +42,12 @@ class FlowerClient(fl.client.NumPyClient):
             print('[Client {}] Continue the training by loading the checkpoint from epoch {}'
                   .format(self.cid, warm_start))
             loading_checkpoint(self.model, self.cid, model_name, warm_start)
-
         print('[Client {}] Start training the model'.format(self.cid))
         local_model, history = training_model(self.x, self.y, self.model, model_name, nb_epoch, self.cid,
                                               warmstart='0', batch_size=batch_size, generator_type=generator_type,
                                               augmentation=augmentation, class_weight=class_weight,
                                               vali_ratio=vali_ratio, input_shape=input_shape)
-        training_history.append(history.history)
-        print('Appended to training_history which is now of size {}'.format(len(training_history)))
+        save_history(self.cid, history)
         self.model = local_model
         evaluation_metrics = {'loss': history.history['loss'], 'accuracy': history.history['accuracy']}
         return self.model.get_weights(), len(self.y), evaluation_metrics
@@ -62,6 +59,13 @@ class FlowerClient(fl.client.NumPyClient):
         yt = preprocess_labels(self.yt, len(np.unique(self.yt)))
         loss, accuracy = self.model.evaluate(self.xt, yt)
         return loss, len(self.yt), {'accuracy': float(accuracy)}
+
+
+def save_history(cid,  history):
+    hist_df = pd.DataFrame(history.history)
+    hist_csv_file = f"./logs/{model_name}/client-{cid}/history-{cid}.csv"
+    with open(hist_csv_file, mode='w') as f:
+        hist_df.to_csv(f)
 
 
 def get_client_train_data(client_id):

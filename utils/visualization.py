@@ -5,6 +5,7 @@ import tensorflow as tf
 from tensorflow import keras
 import seaborn as sns
 import os
+import random
 
 
 def creating_dir(filedir):
@@ -12,24 +13,26 @@ def creating_dir(filedir):
 
 
 def plot_hist(training_history, filename):
-    fig, axs = plt.subplots(len(training_history), 2, figsize=(20, 6*len(training_history)))
-    for i, history in enumerate(training_history):
-        axs[i, 0].plot(history['accuracy'], 'b', history['val_accuracy'], 'r')
-        axs[i, 0].set_ylabel('Accuracy Rate', fontsize=12)
-        axs[i, 0].set_xlabel('Iteration', fontsize=12)
-        axs[i, 0].set_title(f'Client {i+1} Accuracy', fontsize=12)
-        axs[i, 0].legend(['Training Accuracy', 'Validation Accuracy'], fontsize=12, loc='best')
-        axs[i, 1].plot(history['loss'], 'b', history['val_loss'], 'r')
-        axs[i, 1].set_ylabel('Loss', fontsize=12)
-        axs[i, 1].set_xlabel('Iteration', fontsize=12)
-        axs[i, 1].set_title(f'Client {i+1} Loss', fontsize=14)
-        axs[i, 1].legend(['Training Loss', 'Validation Loss'], fontsize=12, loc='best')
-    plt.tight_layout()
+    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
+    for i, client_history in training_history.items():
+        color = tuple(random.uniform(0, 1) for _ in range(3))
+        ax1.plot(client_history['accuracy'], client_history['val_accuracy'], color=color)
+        ax2.plot(client_history['loss'], client_history['val_loss'], color=color)
+    ax1.set_ylabel('Accuracy Rate', fontsize=12)
+    ax1.set_xlabel('Iteration', fontsize=12)
+    ax1.set_title('Categorical Cross Entropy (Data augmentation)', fontsize=12)
+    ax1.legend(['Training Accuracy', 'Validation Accuracy'], fontsize=12, loc='best')
+    ax2.set_ylabel('Loss', fontsize=12)
+    ax2.set_xlabel('Iteration', fontsize=12)
+    ax2.set_title('Learning Curve', fontsize=14)
+    ax2.legend(['Training Loss', 'Validation Loss'], fontsize=12, loc='best')
     plt.savefig(filename+'.png')
     #plt.show()
 
 
-def plot_confmat(confmatrix, confname, labels=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']):
+def plot_confmat(confmatrix, confname, labels=None):
+    if labels is None:
+        labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     plt.figure(figsize=(8, 6))
     sns.set(style='whitegrid', palette='muted', font_scale=1.5)
     sns.heatmap(confmatrix, xticklabels=labels, yticklabels=labels, annot=True, fmt="d");

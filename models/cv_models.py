@@ -45,7 +45,6 @@ def create_xception(input_shape, classes=3, fclayers=[2048, 1024], trainable=Fal
     return model
 
 
-
 def create_efficientB3(input_shape, classes=3, fclayers=[2048, 1024], trainable=False, init='imagenet'):
     """
     Architecture and adaptation of the VGG16 for our project
@@ -86,7 +85,6 @@ def create_efficientB0(input_shape, classes=3, fclayers=[2048, 1024], trainable=
     return model
 
 
-
 def create_mobileV2(input_shape, classes=3, fclayers=[2048, 1024], trainable=False, init='imagenet'):
     """
     Architecture and adaptation of the VGG16 for our project
@@ -105,7 +103,6 @@ def create_mobileV2(input_shape, classes=3, fclayers=[2048, 1024], trainable=Fal
     output = Dense(classes, activation="softmax")(x)
     model = Model(mobile_model.input, output)
     return model
-
 
 
 def compiling(model):

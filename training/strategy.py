@@ -1,8 +1,10 @@
-from .samplingdata import BalancedDataGenerator
+from training.samplingdata import BalancedDataGenerator
 from keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 import numpy as np
-from .utils import mix_up, train_val_split, preprocess_labels, compute_class_weight
+from training.utils import mix_up, train_val_split, preprocess_labels, compute_class_weight
+
+arr = []
 
 
 def input_processing(augmentation=True):
