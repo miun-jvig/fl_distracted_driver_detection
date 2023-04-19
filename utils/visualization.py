@@ -16,8 +16,8 @@ def plot_hist(training_history, filename):
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
     for i, client_history in training_history.items():
         color = tuple(random.uniform(0, 1) for _ in range(3))
-        ax1.plot(client_history['accuracy'], client_history['val_accuracy'], color=color)
-        ax2.plot(client_history['loss'], client_history['val_loss'], color=color)
+        ax1.plot(client_history['accuracy'], 'b', client_history['val_accuracy'], 'r')
+        ax2.plot(client_history['loss'], 'b', client_history['val_loss'], 'r')
     ax1.set_ylabel('Accuracy Rate', fontsize=12)
     ax1.set_xlabel('Iteration', fontsize=12)
     ax1.set_title('Categorical Cross Entropy (Data augmentation)', fontsize=12)

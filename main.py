@@ -12,8 +12,11 @@ model_name = model_cfg['model_name']
 def main():
     # start simulation
     simulation()
-    # evaluate results
+
+    # load model and test data
     model, xt, yt = load_test_data_and_model()
+
+    # evaluate results
     print('Evaluating the model on the test set and store everything in {}'.format(models_dir))
     evaluation(model, model_name, xt, yt, os.path.join(models_dir, model_name))
 

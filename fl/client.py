@@ -6,6 +6,7 @@ from fl.clientdata import load_training_data, load_test_data_and_model
 from training.utils import preprocess_labels
 import numpy as np
 import pandas as pd
+import os
 
 # data from config
 rows, cols = int(data_cfg['rows']), int(data_cfg['cols'])
@@ -47,7 +48,7 @@ class FlowerClient(fl.client.NumPyClient):
                                               warmstart='0', batch_size=batch_size, generator_type=generator_type,
                                               augmentation=augmentation, class_weight=class_weight,
                                               vali_ratio=vali_ratio, input_shape=input_shape)
-        save_history(self.cid, history)
+        save_history(self.cid, history, config['server_round'])
         self.model = local_model
         evaluation_metrics = {'loss': history.history['loss'], 'accuracy': history.history['accuracy']}
         return self.model.get_weights(), len(self.y), evaluation_metrics
@@ -61,11 +62,16 @@ class FlowerClient(fl.client.NumPyClient):
         return loss, len(self.yt), {'accuracy': float(accuracy)}
 
 
-def save_history(cid,  history):
+def save_history(cid, history, round_num):
     hist_df = pd.DataFrame(history.history)
+    hist_df['round'] = round_num
     hist_csv_file = f"./logs/{model_name}/client-{cid}/history-{cid}.csv"
-    with open(hist_csv_file, mode='w') as f:
-        hist_df.to_csv(f)
+    if round_num == 1:
+        with open(hist_csv_file, mode='w') as f:
+            hist_df.to_csv(f, index=False)
+    else:
+        with open(hist_csv_file, mode='a') as f:
+            hist_df.to_csv(f, header=False, index=False)
 
 
 def get_client_train_data(client_id):
