@@ -12,22 +12,30 @@ def creating_dir(filedir):
     os.makedirs(filedir, exist_ok=True)
 
 
+def create_plot(ax, x, y, y_label, x_label, title, labels, fontsize=12):
+    ax.plot(x, 'b', y, 'r')
+    ax.set_ylabel(y_label, fontsize=fontsize)
+    ax.set_xlabel(x_label, fontsize=fontsize)
+    ax.set_title(title, fontsize=fontsize)
+    ax.legend(labels, fontsize=fontsize, loc='best')
+
+
 def plot_hist(training_history, filename):
-    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
     for i, client_history in training_history.items():
-        color = tuple(random.uniform(0, 1) for _ in range(3))
-        ax1.plot(client_history['accuracy'], 'b', client_history['val_accuracy'], 'r')
-        ax2.plot(client_history['loss'], 'b', client_history['val_loss'], 'r')
-    ax1.set_ylabel('Accuracy Rate', fontsize=12)
-    ax1.set_xlabel('Iteration', fontsize=12)
-    ax1.set_title('Categorical Cross Entropy (Data augmentation)', fontsize=12)
-    ax1.legend(['Training Accuracy', 'Validation Accuracy'], fontsize=12, loc='best')
-    ax2.set_ylabel('Loss', fontsize=12)
-    ax2.set_xlabel('Iteration', fontsize=12)
-    ax2.set_title('Learning Curve', fontsize=14)
-    ax2.legend(['Training Loss', 'Validation Loss'], fontsize=12, loc='best')
-    plt.savefig(filename+'.png')
-    #plt.show()
+        fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
+        # first plot
+        create_plot(ax1, client_history['accuracy'], client_history['val_accuracy'], 'Accuracy Rate', 'Iteration',
+                    'Categorical Cross Entropy (Data augmentation)', ['Training Accuracy', 'Validation Accuracy'])
+
+        # second plot
+        create_plot(ax2, client_history['loss'], client_history['val_loss'], 'Loss', 'Iteration', 'Learning Curve',
+                    ['Training Loss', 'Validation Loss'])
+
+        # save figure
+        nb_epochs = len(client_history['accuracy'])
+        fig.suptitle(f"ClientID = {i}, Epochs = {nb_epochs}", fontsize=16)
+        plt.savefig(filename+f"_client-{i}"+'.png')
+        # plt.show()
 
 
 def plot_confmat(confmatrix, confname, labels=None):
