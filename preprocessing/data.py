@@ -114,5 +114,5 @@ if __name__ == '__main__':
     print(args)
     convert(args.datapath, args.destpath, args.set, args.rows, args.cols, args.part)
 
-# python preprocessing\data.py -o h5 -d data/statefarm/ -r 128 -c 128 -n 2 -s train
+# python preprocessing\data.py -o h5 -d data/statefarm/ -r 128 -c 128 -n 10 -s train
 # python preprocessing\data.py -o h5 -d data/statefarm/ -r 128 -c 128 -s test

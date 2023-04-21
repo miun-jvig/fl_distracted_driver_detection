@@ -1,10 +1,12 @@
-import flwr as fl
-import torch
 from flwr.common import Metrics
-from typing import List, Tuple
-from fl.clientdata import model
+from fl.clientdata import load_model, load_test_data, save_history
 from fl.client import client_fn
 from config.configloader import client_cfg, config_file, model_cfg
+from typing import Dict, List, Optional, Tuple
+from training.utils import preprocess_labels
+import flwr as fl
+import numpy as np
+import torch
 
 # data from config
 model_name = model_cfg['model_name']
@@ -12,7 +14,7 @@ nb_clients = int(client_cfg['nb_clients'])
 nb_rounds = int(client_cfg['nb_rounds'])
 device = client_cfg['device']
 nb_device = int(client_cfg['nb_device'])
-params = model.get_weights()
+params = load_model().get_weights()
 print('Reading {} as the configuration file'.format(config_file))
 print('Creating a {} model'.format(model_name))
 
@@ -33,10 +35,42 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     return {"accuracy": sum(accuracies) / sum(examples)}
 
 
+def evaluate(server_round: int, parameters: fl.common.NDArrays, config: Dict[str, fl.common.Scalar],)\
+        -> Optional[Tuple[float, Dict[str, fl.common.Scalar]]]:
+    # specify path for server checkpoint
+    path = "./logs/" + model_name + "/server/"
+    filepath = path + f"history.csv"
+    checkpoint_path = path + f"/cpft-{server_round}.ckpt"
+    model = load_model()
+
+    # save the model checkpoint
+    if server_round != 1:
+        weights = np.array(parameters, dtype=object)
+        model.set_weights(weights)
+        model.save_weights(checkpoint_path)
+
+    # evaluate the model and compute the loss and accuracy
+    xt, yt = load_test_data()
+    ytest = preprocess_labels(yt, len(np.unique(yt)))
+    loss, accuracy = model.evaluate(xt, ytest)
+
+    if server_round == 1:
+        with open(filepath, mode='w') as f:
+            f.write("accuracy, loss, round_number\n")
+            f.write("{}, {}, {}\n".format(accuracy, loss, server_round))
+    else:
+        with open(filepath, mode='a') as f:
+            f.write("{}, {}, {}\n".format(accuracy, loss, server_round))
+
+    print(f"Server-side evaluation loss {loss} / accuracy {accuracy}")
+    return loss, {"accuracy": accuracy}
+
+
 strategy = fl.server.strategy.FedAvg(
     initial_parameters=fl.common.ndarrays_to_parameters(params),
     on_fit_config_fn=fit_config,
     evaluate_metrics_aggregation_fn=weighted_average,
+    evaluate_fn=evaluate,
 )
 
 

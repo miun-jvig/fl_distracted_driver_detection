@@ -5,7 +5,6 @@ import tensorflow as tf
 from tensorflow import keras
 import seaborn as sns
 import os
-import random
 
 
 def creating_dir(filedir):
@@ -22,7 +21,7 @@ def create_plot(ax, x, y, y_label, x_label, title, labels, fontsize=12):
 
 def plot_hist(training_history, filename):
     for i, client_history in training_history.items():
-        fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
+        fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(7, 7))
         # first plot
         create_plot(ax1, client_history['accuracy'], client_history['val_accuracy'], 'Accuracy Rate', 'Iteration',
                     'Categorical Cross Entropy (Data augmentation)', ['Training Accuracy', 'Validation Accuracy'])
@@ -34,6 +33,7 @@ def plot_hist(training_history, filename):
         # save figure
         nb_epochs = len(client_history['accuracy'])
         fig.suptitle(f"ClientID = {i}, Epochs = {nb_epochs}", fontsize=16)
+        fig.tight_layout()
         plt.savefig(filename+f"_client-{i}"+'.png')
         # plt.show()
 
@@ -43,7 +43,7 @@ def plot_confmat(confmatrix, confname, labels=None):
         labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     plt.figure(figsize=(8, 6))
     sns.set(style='whitegrid', palette='muted', font_scale=1.5)
-    sns.heatmap(confmatrix, xticklabels=labels, yticklabels=labels, annot=True, fmt="d");
+    sns.heatmap(confmatrix, xticklabels=labels, yticklabels=labels, annot=True, fmt="d")
     plt.title("Confusion matrix")
     plt.ylabel('True label')
     # plt.ylim((16,14))
