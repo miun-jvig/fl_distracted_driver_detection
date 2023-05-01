@@ -4,6 +4,7 @@ from imblearn.tensorflow import balanced_batch_generator
 import tensorflow as tf
 from keras.utils import Sequence
 
+
 class BalancedDataGenerator(Sequence):
     """
     ImageDataGenerator + RandomOverSampling

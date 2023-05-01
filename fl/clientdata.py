@@ -17,7 +17,7 @@ classes = int(model_cfg['classes'])
 
 # creating global model
 model = create_model(model_name, input_shape, classes, fc_layers, trainable, init)
-compiling(model)
+compiling(model, finetuning=trainable)
 # model.summary()
 
 
