@@ -28,7 +28,13 @@ def create_lite_model(model):
 
 def fit_config(server_round: int):
     """Return training configuration dict for each round."""
+    model = load_model()
+    filepath = "./logs/" + model_name + "/server/" + f"cpft-{server_round - 1}.ckpt"
+    model.load_weights(filepath)
+    lite_model = create_lite_model(model)
+
     config = {
+        "lite_model": lite_model,
         "server_round": server_round,  # The current round of federated learning
     }
     return config
@@ -42,7 +48,7 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     return {"accuracy": sum(accuracies) / sum(examples)}
 
 
-def evaluate(server_round: int, parameters: fl.common.NDArrays, config: Dict[str, fl.common.Scalar],)\
+def evaluate(server_round: int, parameters: fl.common.NDArrays, config: Dict[str, fl.common.Scalar], ) \
         -> Optional[Tuple[float, Dict[str, fl.common.Scalar]]]:
     # specify path for server checkpoint
     path = "./logs/" + model_name + "/server/"
@@ -79,7 +85,6 @@ strategy = fl.server.strategy.FedAvg(
     evaluate_metrics_aggregation_fn=weighted_average,
     evaluate_fn=evaluate,
 )
-
 
 client_resources = None
 DEVICE = torch.device(device)

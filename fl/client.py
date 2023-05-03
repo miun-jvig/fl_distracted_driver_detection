@@ -4,6 +4,7 @@ from training.strategy import training_model
 from config.configloader import data_cfg, strategy_cfg, model_cfg
 from fl.clientdata import load_training_data, load_test_data, load_model, save_history
 from training.utils import preprocess_labels
+import tensorflow as tf
 import numpy as np
 import random
 
@@ -36,7 +37,7 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         """Fit model on the client's data given parameters."""
-        print('[Client {}] fit, config: {}'.format(self.cid, config))
+        print('[Client {}] fit'.format(self.cid))
         self.model.set_weights(parameters)
         if warm_start != str(0):
             print('[Client {}] Continue the training by loading the checkpoint from epoch {}'
