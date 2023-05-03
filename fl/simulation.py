@@ -1,9 +1,10 @@
 from flwr.common import Metrics
-from fl.clientdata import load_model, load_test_data, save_history
+from fl.clientdata import load_model, load_test_data
 from fl.client import client_fn
 from config.configloader import client_cfg, config_file, model_cfg
 from typing import Dict, List, Optional, Tuple
 from training.utils import preprocess_labels
+import tensorflow as tf
 import flwr as fl
 import numpy as np
 import torch
@@ -17,6 +18,12 @@ nb_device = int(client_cfg['nb_device'])
 params = load_model().get_weights()
 print('Reading {} as the configuration file'.format(config_file))
 print('Creating a {} model'.format(model_name))
+
+
+def create_lite_model(model):
+    converter = tf.lite.TFLiteConverter.from_keras_model(model)
+    lite_model = converter.convert()
+    return lite_model
 
 
 def fit_config(server_round: int):
