@@ -36,7 +36,8 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         """Fit model on the client's data given parameters."""
-        print('[Client {}] fit, config: {}'.format(self.cid, config))
+        print('[Client {}] fit'.format(self.cid))
+        # set weights
         self.model.set_weights(parameters)
         if warm_start != str(0):
             print('[Client {}] Continue the training by loading the checkpoint from epoch {}'

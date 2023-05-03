@@ -110,7 +110,7 @@ def fitting(training_generator, validation_generator, model, cid, warmstart,
     csv_eval_path = path + "/training_startingfrom" + warmstart + ".log"
     csv_callback = tf.keras.callbacks.CSVLogger(csv_eval_path)
     early_stopping = tf.keras.callbacks.EarlyStopping(
-        monitor="val_loss", patience=3, restore_best_weights=True
+        monitor="val_loss", patience=5, restore_best_weights=True
     )
     model.save_weights(checkpoint_path.format(epoch=0))
     history = model.fit(training_generator,
