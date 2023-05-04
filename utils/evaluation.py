@@ -8,8 +8,6 @@ import numpy as np
 import glob
 import os
 
-use_lite_model = client_cfg.get('use_lite_model', '').lower() == 'true'
-
 
 def read_history_files(model_name):
     history_dir = "./logs/" + model_name
@@ -25,25 +23,39 @@ def read_history_files(model_name):
     return histories
 
 
-def evaluation(model, model_name, xt, yt, filedir):
-    creating_dir(filedir)
-    if use_lite_model:
-        interpreter = tf.lite.Interpreter(model_content=model)
-        interpreter.allocate_tensors()
-        input_details = interpreter.get_input_details()
-        output_details = interpreter.get_output_details()
-        # update input shape based on the actual shape of xt
-        input_shape = input_details[0]['shape']
-        input_shape[0] = xt.shape[0]
-        interpreter.resize_tensor_input(input_details[0]['index'], input_shape)
-        interpreter.allocate_tensors()
-        xt = xt.astype(np.float32)
-        interpreter.set_tensor(input_details[0]['index'], xt)
-        interpreter.invoke()
-        y_prediction = interpreter.get_tensor(output_details[0]['index'])
+def evaluate_compressed_model(model, xt, use_lite_model):
+    if use_lite_model == 'int':
+        model_type = 'u' + use_lite_model + '8'  # uint8
     else:
-        y_prediction = model.predict(xt)
-        model.save(os.path.join(filedir, 'final.model'))
+        model_type = use_lite_model + '32'  # float32
+    interpreter = tf.lite.Interpreter(model_content=model)
+    interpreter.allocate_tensors()
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+    # update input shape based on the actual shape of xt
+    input_shape = input_details[0]['shape']
+    input_shape[0] = xt.shape[0]
+    interpreter.resize_tensor_input(input_details[0]['index'], input_shape)
+    interpreter.allocate_tensors()
+    xt = xt.astype(model_type)
+    interpreter.set_tensor(input_details[0]['index'], xt)
+    interpreter.invoke()
+    y_prediction = interpreter.get_tensor(output_details[0]['index'])
+    return y_prediction
+
+
+def evaluate_keras_model(model, xt, filedir):
+    y_prediction = model.predict(xt)
+    model.save(os.path.join(filedir, 'final.model'))
+    return y_prediction
+
+
+def evaluation(model, model_name, xt, yt, filedir, use_lite_model=None):
+    creating_dir(filedir)
+    if use_lite_model == 'float' or use_lite_model == 'int':
+        y_prediction = evaluate_compressed_model(model, xt, use_lite_model)
+    else:
+        y_prediction = evaluate_keras_model(model, xt, filedir)
     confmat = confusion_matrix(yt, y_prediction.argmax(axis=1))
     training_history = read_history_files(model_name)
     plot_hist(training_history, os.path.join(filedir, 'training_history'))
