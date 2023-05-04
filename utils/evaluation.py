@@ -1,10 +1,8 @@
-from utils.visualization import creating_dir, plot_hist, plot_confmat, make_gradcam_heatmap, make_gradcam_img, \
-    get_img_array, view_img
+from utils.visualization import creating_dir, plot_hist, plot_confmat
 from sklearn.metrics import confusion_matrix, classification_report
-from config.configloader import client_cfg
 import tensorflow as tf
-import pandas as pd
 import numpy as np
+import pandas as pd
 import glob
 import os
 
@@ -24,10 +22,8 @@ def read_history_files(model_name):
 
 
 def evaluate_compressed_model(model, xt, use_lite_model):
-    if use_lite_model == 'int':
-        model_type = 'u' + use_lite_model + '8'  # uint8
-    else:
-        model_type = use_lite_model + '32'  # float32
+    if 'float' in use_lite_model:
+        use_lite_model = "float32"  # this value is used with xt.astype(use_lite_model), and float8 doesn't exist
     interpreter = tf.lite.Interpreter(model_content=model)
     interpreter.allocate_tensors()
     input_details = interpreter.get_input_details()
@@ -37,7 +33,7 @@ def evaluate_compressed_model(model, xt, use_lite_model):
     input_shape[0] = xt.shape[0]
     interpreter.resize_tensor_input(input_details[0]['index'], input_shape)
     interpreter.allocate_tensors()
-    xt = xt.astype(model_type)
+    xt = xt.astype(use_lite_model)
     interpreter.set_tensor(input_details[0]['index'], xt)
     interpreter.invoke()
     y_prediction = interpreter.get_tensor(output_details[0]['index'])
@@ -52,7 +48,7 @@ def evaluate_keras_model(model, xt, filedir):
 
 def evaluation(model, model_name, xt, yt, filedir, use_lite_model=None):
     creating_dir(filedir)
-    if use_lite_model == 'float' or use_lite_model == 'int':
+    if 'int' or 'float' in use_lite_model:
         y_prediction = evaluate_compressed_model(model, xt, use_lite_model)
     else:
         y_prediction = evaluate_keras_model(model, xt, filedir)

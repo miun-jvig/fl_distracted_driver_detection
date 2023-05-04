@@ -38,12 +38,15 @@ def representative_data_gen():
 def create_lite_model(old_model, lite_model_type):
     converter = tf.lite.TFLiteConverter.from_keras_model(old_model)
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
-    if lite_model_type == 'int':
+    if 'int' in lite_model_type:
         converter.representative_dataset = representative_data_gen
         # Ensure that if any ops can't be quantized, the converter throws an error
         converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
         # Set the input and output tensors to uint8 (APIs added in r2.3)
         converter.inference_input_type = tf.uint8
         converter.inference_output_type = tf.uint8
+    elif lite_model_type == 'float16':
+        converter.target_spec.supported_types = [tf.float16]
+
     lite_model = converter.convert()
     return lite_model
