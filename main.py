@@ -1,11 +1,9 @@
-from fl.simulation import simulation
+from fl.server import simulation
 from utils.evaluation import evaluation
 from fl.clientdata import load_test_data
 from models.model import load_model, create_lite_model
 from config.configloader import model_cfg, client_cfg
 import os
-import tensorflow as tf
-import numpy as np
 
 # data
 models_dir = model_cfg['models_dir']
@@ -16,7 +14,7 @@ use_lite_model = client_cfg.get('use_lite_model', '').lower() == 'true'
 
 def main():
     # start simulation
-    #simulation()
+    simulation()
 
     # load model and test data
     xt, yt = load_test_data()
