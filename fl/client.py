@@ -2,9 +2,10 @@ import flwr as fl
 from models.cv_models import loading_checkpoint
 from training.strategy import training_model
 from config.configloader import data_cfg, strategy_cfg, model_cfg
-from fl.clientdata import load_training_data, load_test_data, load_model, save_history
+from fl.clientdata import load_training_data, load_test_data
+from models.model import load_model
 from training.utils import preprocess_labels
-import tensorflow as tf
+import pandas as pd
 import numpy as np
 import random
 
@@ -61,6 +62,17 @@ class FlowerClient(fl.client.NumPyClient):
         yt = preprocess_labels(self.yt, len(np.unique(self.yt)))
         loss, accuracy = self.model.evaluate(self.xt, yt)
         return loss, len(self.yt), {'accuracy': float(accuracy)}
+
+
+def save_history(history, round_num, filepath):
+    hist_df = pd.DataFrame(history.history)
+    hist_df['round'] = round_num
+    if round_num == 1:
+        with open(filepath, mode='w') as f:
+            hist_df.to_csv(f, index=False)
+    else:
+        with open(filepath, mode='a') as f:
+            hist_df.to_csv(f, header=False, index=False)
 
 
 def get_client_train_data(client_id):

@@ -24,7 +24,7 @@ def plot_hist(training_history, filename):
         fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(7, 7))
         # first plot
         create_plot(ax1, client_history['accuracy'], client_history['val_accuracy'], 'Accuracy Rate', 'Iteration',
-                    'Categorical Cross Entropy (Data augmentation)', ['Training Accuracy', 'Validation Accuracy'])
+                    'Categorical Cross Entropy', ['Training Accuracy', 'Validation Accuracy'])
 
         # second plot
         create_plot(ax2, client_history['loss'], client_history['val_loss'], 'Loss', 'Iteration', 'Learning Curve',
