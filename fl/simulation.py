@@ -1,10 +1,10 @@
 from flwr.common import Metrics
-from fl.clientdata import load_model, load_test_data
+from fl.clientdata import load_test_data
+from models.model import load_model
 from fl.client import client_fn
 from config.configloader import client_cfg, config_file, model_cfg
 from typing import Dict, List, Optional, Tuple
 from training.utils import preprocess_labels
-import tensorflow as tf
 import flwr as fl
 import numpy as np
 import torch
@@ -13,7 +13,6 @@ import torch
 model_name = model_cfg['model_name']
 nb_clients = int(client_cfg['nb_clients'])
 nb_rounds = int(client_cfg['nb_rounds'])
-use_lite_model = bool(client_cfg['lite_model'])
 device = client_cfg['device']
 nb_device = int(client_cfg['nb_device'])
 params = load_model().get_weights()
@@ -37,7 +36,7 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     return {"accuracy": sum(accuracies) / sum(examples)}
 
 
-def evaluate(server_round: int, parameters: fl.common.NDArrays, config: Dict[str, fl.common.Scalar],)\
+def evaluate(server_round: int, parameters: fl.common.NDArrays, config: Dict[str, fl.common.Scalar], ) \
         -> Optional[Tuple[float, Dict[str, fl.common.Scalar]]]:
     # specify path for server checkpoint
     path = "./logs/" + model_name + "/server/"
@@ -46,9 +45,10 @@ def evaluate(server_round: int, parameters: fl.common.NDArrays, config: Dict[str
     model = load_model()
 
     # save the model checkpoint
-    weights = np.array(parameters, dtype=object)
-    model.set_weights(weights)
-    model.save_weights(checkpoint_path)
+    if server_round != 1:
+        weights = np.array(parameters, dtype=object)
+        model.set_weights(weights)
+        model.save_weights(checkpoint_path)
 
     # evaluate the model and compute the loss and accuracy
     xt, yt = load_test_data()
@@ -73,7 +73,6 @@ strategy = fl.server.strategy.FedAvg(
     evaluate_metrics_aggregation_fn=weighted_average,
     evaluate_fn=evaluate,
 )
-
 
 client_resources = None
 DEVICE = torch.device(device)
