@@ -17,3 +17,6 @@ Convert the dataset using the python script in preprocessing/data.py. It will fi
 
 ## 2 Model experiments
 Use the configuration file (config.ini) to select the dataset, the model and the training strategy to experiment. Then run the main script. It should train a model on the data. The logs are automatically stored into a created logs directory. At the end of the training, an evaluation step is done on the test set and the results are stored in the 'models_dir' (see config.ini)
+
+## 3 Results
+The model reaches a 86 %~ prediction rate on new and unseen data, using batch_size = 64, dense layers = 1024, fine tuning, early stopping, 10 training epochs, 3 FL clients, and 5 FL rounds.
