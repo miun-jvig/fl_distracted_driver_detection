@@ -8,6 +8,10 @@ import os
 
 
 def read_history_files(model_name):
+    """
+    Read .csv-files containing history of clients and puts them into a histories dictionary, which has the same
+    structure as a history object created by the fit() function.
+    """
     history_dir = "./logs/" + model_name
     history_files = glob.glob(history_dir + "/client-*/history-*.csv")
     histories = {}
@@ -22,6 +26,7 @@ def read_history_files(model_name):
 
 
 def evaluate_compressed_model(model, xt, use_lite_model):
+    """Evaluate a quantized model"""
     if 'float' in use_lite_model:
         use_lite_model = "float32"  # this value is used with xt.astype(use_lite_model), and float8 doesn't exist
     interpreter = tf.lite.Interpreter(model_content=model)
@@ -41,12 +46,14 @@ def evaluate_compressed_model(model, xt, use_lite_model):
 
 
 def evaluate_keras_model(model, xt, filedir):
+    """Regular evaluation for a keras model"""
     y_prediction = model.predict(xt)
     model.save(os.path.join(filedir, 'final.model'))
     return y_prediction
 
 
 def evaluation(model, model_name, xt, yt, filedir, use_lite_model=None):
+    """Evaluates either a quantized model or a keras model"""
     creating_dir(filedir)
     if 'int' or 'float' in use_lite_model:
         y_prediction = evaluate_compressed_model(model, xt, use_lite_model)

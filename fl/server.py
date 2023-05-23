@@ -21,7 +21,17 @@ print('Creating a {} model'.format(model_name))
 
 
 def fit_config(server_round: int):
-    """Return training configuration dict for each round."""
+    """
+    Return training configuration for each round. This function is used to send information to the clients, as they
+    are run on threads. The clients can reach this information with the help of the parameter "config" in
+    get_parameters, fit, and evaluate.
+
+    Args:
+        server_round: the current federated learning round.
+
+    Returns:
+        training configuration for each round.
+    """
     config = {
         "server_round": server_round,  # The current round of federated learning
     }
@@ -29,6 +39,7 @@ def fit_config(server_round: int):
 
 
 def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
+    """Aggregate fit results using weighted average."""
     # Multiply accuracy of each client by number of examples used
     accuracies = [num_examples * m["accuracy"] for num_examples, m in metrics]
     examples = [num_examples for num_examples, _ in metrics]
@@ -38,6 +49,11 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
 
 def evaluate(server_round: int, parameters: fl.common.NDArrays, config: Dict[str, fl.common.Scalar], ) \
         -> Optional[Tuple[float, Dict[str, fl.common.Scalar]]]:
+    """
+    Evaluate global model parameters using an evaluation function.
+
+    Saves the weights of the model which is later used in main.py for evaluation.
+    """
     # specify path for server checkpoint
     path = "./logs/" + model_name + "/server/"
     filepath = path + f"history.csv"
@@ -81,6 +97,11 @@ if DEVICE.type == "cuda":
 
 
 def simulation():
+    """
+    Simulates a federated learning scenario, clients are created on client_fn and run on threads.
+
+    Note that threads are ephemeral and deleted after use.
+    """
     results = fl.simulation.start_simulation(
         client_fn=client_fn,
         num_clients=nb_clients,

@@ -14,7 +14,7 @@ use_lite_model = client_cfg['lite_model']
 
 def main():
     # start simulation
-    #simulation()
+    simulation()
 
     # load model and test data
     xt, yt = load_test_data()
@@ -22,12 +22,13 @@ def main():
     filepath = "./logs/" + model_name + f"/server/cpft-{nb_fl_rounds}.ckpt"
     model.load_weights(filepath)
 
-    # compress model to lite
-    if use_lite_model is not None:
-        model = create_lite_model(model, use_lite_model)
+    # quantize model
+    if 'float' or 'int ' in use_lite_model:
+        model = create_lite_model(model, use_lite_model)  # create lite model
 
+    # print summary for both models to see size difference
     # model.summary()
-    # summary(int_model)
+    # summary(lite_model)
 
     # evaluate results
     print('Evaluating the model on the test set and store everything in {}'.format(models_dir))

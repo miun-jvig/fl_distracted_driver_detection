@@ -24,6 +24,7 @@ generator_type = strategy_cfg['generator_type']
 
 
 class FlowerClient(fl.client.NumPyClient):
+    """Client used for federated learning training and local evaluation"""
     def __init__(self, cid, global_model, x, y, xt, yt):
         self.cid = cid
         self.model = global_model
@@ -65,6 +66,7 @@ class FlowerClient(fl.client.NumPyClient):
 
 
 def save_history(history, round_num, filepath):
+    """Saves history of training round to a .csv file, later used for creating training/loss history graphs"""
     hist_df = pd.DataFrame(history.history)
     hist_df['round'] = round_num
     if round_num == 1:
@@ -76,11 +78,13 @@ def save_history(history, round_num, filepath):
 
 
 def get_client_train_data(client_id):
+    """Get train data using client_id, which is a (cid) in client_fn"""
     clientmodels = load_training_data()
     return clientmodels[client_id]
 
 
 def get_random_client_train_data():
+    """Gets a random .h5 file for training, an improvement to this would be using crossvalidation"""
     clientmodels = load_training_data()
     key, value = random.choice(list(clientmodels.items()))
     print(f"Chose random model {key}")
@@ -88,6 +92,16 @@ def get_random_client_train_data():
 
 
 def client_fn(cid) -> fl.client.NumPyClient:
+    """
+    Responsible for creating clients in start_simulation. Note that clients are ephemeral, run on threads,
+    and deleted after use.
+
+    Args:
+        cid: start_simulation will automatically give a cid to clients created.
+
+    Returns:
+        A FlowerClient, as defined above, which can train and evaluate data.
+    """
     print('Creating [Client {}]'.format(cid))
     # x, y = get_client_train_data(cid)
     x, y = get_random_client_train_data()

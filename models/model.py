@@ -21,14 +21,21 @@ compiling(model, finetuning=trainable)
 
 
 def load_model():
+    """Loads model"""
     return model
 
 
 def summary(lite_model):
+    """Returns the summary of a TensorFlow Lite model"""
     return tf.lite.experimental.Analyzer.analyze(model_content=lite_model)
 
 
 def representative_data_gen():
+    """
+    This function is needed for TensorFlow Lite if you wish to do post-training integer quantization, as stated in
+    https://www.tensorflow.org/lite/performance/model_optimization. It is used to send unlabeled representative
+    samples which is read from a .h5 file containing unlabeled data.
+    """
     file_unlabel = read_hdf5(hdf5_dir, 'unlabeled', rows, cols)
     train_images = np.array(file_unlabel['/images'], dtype=np.float32)
     for input_value in tf.data.Dataset.from_tensor_slices(train_images).batch(1).take(100):
@@ -36,6 +43,17 @@ def representative_data_gen():
 
 
 def create_lite_model(old_model, lite_model_type):
+    """
+    Creates a TensorFlow Lite model from the old model, and then optimizes the precision rate of the model. Default is
+    float32, can create float16, uint8, and float8.
+
+    Args:
+        old_model: The model you wish to quantize.
+        lite_model_type: What value, i.e. float16, uint8, float8.
+
+    Returns:
+        A quantized model.
+    """
     converter = tf.lite.TFLiteConverter.from_keras_model(old_model)
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
     if 'int' in lite_model_type:

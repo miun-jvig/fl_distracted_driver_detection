@@ -9,6 +9,7 @@ hdf5_dir = Path(data_cfg['data_dir'])
 
 
 def load_test_data():
+    """Load test data from a .h5 file"""
     # loading the test dataset
     file_test = read_hdf5(hdf5_dir, 'test', rows, cols)
     xt = file_test["/images"]
@@ -17,6 +18,13 @@ def load_test_data():
 
 
 def load_training_data():
+    """
+    Load training data from one or more .h5 files.
+
+    Returns:
+        A dictionary containing train data and labels. The key for the dictionary is '0', '1', ..., 'n', which works
+        well as start_simulation creates clients with cid with similar numbers, i.e. '0', '1', ..., 'n'.
+    """
     print('Reading the dataset from {}'.format(hdf5_dir))
     train_files = []
     train_data = {}

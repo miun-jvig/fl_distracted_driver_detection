@@ -12,6 +12,7 @@ def creating_dir(filedir):
 
 
 def create_plot(ax, x, y, y_label, x_label, title, labels, fontsize=12):
+    """Create plot"""
     ax.plot(x, 'b', y, 'r')
     ax.set_ylabel(y_label, fontsize=fontsize)
     ax.set_xlabel(x_label, fontsize=fontsize)
@@ -20,6 +21,7 @@ def create_plot(ax, x, y, y_label, x_label, title, labels, fontsize=12):
 
 
 def plot_hist(training_history, filename):
+    """Plot two different histograms, one containing training history and the other loss history"""
     for i, client_history in training_history.items():
         fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(7, 7))
         # first plot
@@ -39,6 +41,7 @@ def plot_hist(training_history, filename):
 
 
 def plot_confmat(confmatrix, confname, labels=None):
+    """Plot confusion matrix"""
     if labels is None:
         labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     plt.figure(figsize=(8, 6))
